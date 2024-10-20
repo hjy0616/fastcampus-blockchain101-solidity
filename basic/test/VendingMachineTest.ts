@@ -18,7 +18,6 @@ describe("VendingMachine", function () {
       const balance = await vendingMachine.cupcakeBalances(
         vendingMachine.getAddress()
       );
-      console.log("Initial cupcake balance:", balance.toString());
       expect(balance).to.equal(100);
     });
   });
@@ -32,12 +31,8 @@ describe("VendingMachine", function () {
       const initialBalance = await vendingMachine.cupcakeBalances(
         otherAccount.address
       );
-      console.log("Initial balance of buyer:", initialBalance.toString());
-
       const purchaseAmount = 10;
       const purchaseValue = ethers.parseEther(purchaseAmount.toString());
-
-      console.log("Attempting to purchase", purchaseAmount, "cupcakes");
 
       await expect(
         vendingMachine
@@ -50,14 +45,11 @@ describe("VendingMachine", function () {
       const finalBalance = await vendingMachine.cupcakeBalances(
         otherAccount.address
       );
-      console.log("Final balance of buyer:", finalBalance.toString());
+      expect(finalBalance).to.equal(initialBalance + BigInt(purchaseAmount));
 
       const machineBalance = await vendingMachine.cupcakeBalances(
         await vendingMachine.getAddress()
       );
-      console.log("Remaining balance in vending machine:", machineBalance.toString());
-
-      expect(finalBalance).to.equal(initialBalance + BigInt(purchaseAmount));
       expect(machineBalance).to.equal(100 - purchaseAmount);
     });
   });
@@ -71,18 +63,13 @@ describe("VendingMachine", function () {
       const initialBalance = await vendingMachine.cupcakeBalances(
         await vendingMachine.getAddress()
       );
-      console.log("Initial vending machine balance:", initialBalance.toString());
-
       const refillAmount = 10;
-      console.log("Attempting to refill", refillAmount, "cupcakes");
 
       await vendingMachine.connect(owner).refill(refillAmount);
 
       const finalBalance = await vendingMachine.cupcakeBalances(
         await vendingMachine.getAddress()
       );
-      console.log("Final vending machine balance:", finalBalance.toString());
-
       expect(finalBalance).to.equal(initialBalance + BigInt(refillAmount));
     });
 
@@ -91,13 +78,9 @@ describe("VendingMachine", function () {
         deployVendingMachineFixture
       );
 
-      console.log("Attempting to refill by non-owner account");
-
       await expect(
         vendingMachine.connect(otherAccount).refill(10)
       ).to.be.revertedWith("Only the owner can refill.");
-
-      console.log("Refill attempt by non-owner was correctly rejected");
     });
   });
 });
